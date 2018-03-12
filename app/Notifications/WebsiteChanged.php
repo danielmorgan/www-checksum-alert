@@ -44,7 +44,9 @@ class WebsiteChanged extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)->line('Website changed');
+        return (new MailMessage)
+            ->line('Website changed')
+            ->action('Check it out', $this->checker->url);
     }
 
     /**
