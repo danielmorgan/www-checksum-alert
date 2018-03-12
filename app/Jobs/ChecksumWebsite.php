@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Checker;
+use App\Notifications\WebsiteChanged;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Bus\Queueable;
@@ -10,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Notification;
 
 class ChecksumWebsite implements ShouldQueue
 {
@@ -49,7 +51,7 @@ class ChecksumWebsite implements ShouldQueue
 
         $checksum = sha1($response->getBody());
 
-        // @todo Notify if checksum changed
+        $this->checker->user->notify(new WebsiteChanged($this->checker));
 
         $this->checker->update([
             'checksum' => $checksum,
