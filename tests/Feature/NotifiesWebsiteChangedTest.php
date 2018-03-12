@@ -21,13 +21,13 @@ class NotifiesWebsiteChangedTest extends TestCase
         parent::setUp();
 
         Bus::fake();
+        $this->actingAs(factory(User::class)->create());
     }
 
     /** @test */
     function can_create_a_checker()
     {
         $response = $this->post('/checker', [
-            'user_id' => factory(User::class)->create()->id,
             'url'     => route('test1'),
         ]);
 
@@ -39,7 +39,6 @@ class NotifiesWebsiteChangedTest extends TestCase
     function a_job_is_queued()
     {
         $this->post('/checker', [
-            'user_id' => factory(User::class)->create()->id,
             'url'     => route('test1'),
         ]);
 

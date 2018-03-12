@@ -11,6 +11,9 @@
 |
 */
 
+Route::get('/', function () {
+    return redirect('checker');
+});
 Route::get('checker', 'CheckerController@index')->name('checker');
 Route::post('checker', 'CheckerController@create')->name('checker.create');
 
@@ -21,3 +24,5 @@ Route::get('test1', function () {
 Route::get('test2', function () {
     return response('bar');
 })->name('test2');
+
+Auth::routes();
