@@ -16,6 +16,7 @@ Route::get('/', function () {
 });
 Route::get('checker', 'CheckerController@index')->name('checker');
 Route::post('checker', 'CheckerController@create')->name('checker.create');
+Route::delete('checker/{checker}', 'CheckerController@destroy')->name('checker.destroy');
 
 Route::get('test1', function () {
     return response('foo');

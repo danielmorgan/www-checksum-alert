@@ -15,7 +15,7 @@ class CheckerController extends Controller
 
     public function index()
     {
-        return view('checker');
+        return view('checkers', ['checkers' => Checker::all()]);
     }
 
     public function create(Request $request)
@@ -29,6 +29,15 @@ class CheckerController extends Controller
 
         return redirect()
             ->route('checker')
-            ->with(compact('checker'));
+            ->with(['message' => 'Created']);
+    }
+
+    public function destroy(Request $request, Checker $checker)
+    {
+        $checker->delete();
+
+        return redirect()
+            ->route('checker')
+            ->with(['message' => 'Deleted']);
     }
 }

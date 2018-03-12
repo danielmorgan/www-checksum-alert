@@ -7,12 +7,11 @@ use App\Jobs\ChecksumWebsite;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class NotifiesWebsiteChangedTest extends TestCase
+class CheckerManagementTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -21,6 +20,7 @@ class NotifiesWebsiteChangedTest extends TestCase
         parent::setUp();
 
         Bus::fake();
+
         $this->actingAs(factory(User::class)->create());
     }
 
@@ -28,7 +28,7 @@ class NotifiesWebsiteChangedTest extends TestCase
     function can_create_a_checker()
     {
         $response = $this->post('/checker', [
-            'url'     => route('test1'),
+            'url' => route('test1'),
         ]);
 
         $response->assertRedirect('/checker');
@@ -36,10 +36,10 @@ class NotifiesWebsiteChangedTest extends TestCase
     }
 
     /** @test */
-    function a_job_is_queued()
+    function a_job_is_dispatched_immediately_on_creation()
     {
         $this->post('/checker', [
-            'url'     => route('test1'),
+            'url' => route('test1'),
         ]);
 
         $checker = Checker::firstOrFail();
@@ -47,5 +47,15 @@ class NotifiesWebsiteChangedTest extends TestCase
         Bus::assertDispatched(ChecksumWebsite::class, function ($job) use ($checker) {
             return $job->checker->id === $checker->id;
         });
+    }
+
+    /** @test */
+    function can_delete_a_checker()
+    {
+        $checker = factory(Checker::class)->create();
+
+        $this->delete("/checker/{$checker->id}");
+
+        $this->assertCount(0, Checker::all());
     }
 }
