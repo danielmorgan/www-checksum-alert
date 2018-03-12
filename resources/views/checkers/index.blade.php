@@ -11,7 +11,7 @@
         @foreach ($checkers as $checker)
             <tr>
                 <td class="align-middle">
-                    {{ $checker->url }}
+                    <a href="{{ $checker->url }}">{{ $checker->url }}</a>
                 </td>
                 <td class="align-middle">
                     {{ $checker->checksum }}
