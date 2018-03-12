@@ -39,12 +39,30 @@ class ChecksumWebsiteTest extends TestCase
     {
         $user = factory(User::class)->create();
         $checker = factory(Checker::class)->create([
-            'user_id' => $user->id,
+            'user_id'  => $user->id,
+            'url'      => route('test1'),
+            'checksum' => 'foo',
         ]);
-        $job = new ChecksumWebsite($checker);
 
+        $job = new ChecksumWebsite($checker);
         $job->handle();
 
         Notification::assertSentTo($user, WebsiteChanged::class);
+    }
+
+    /** @test */
+    function notification_not_sent_if_website_hasnt_changed()
+    {
+        $user = factory(User::class)->create();
+        $checker = factory(Checker::class)->create([
+            'user_id'  => $user->id,
+            'url'      => route('test1'),
+            'checksum' => 'afc5ec85fb153bd2f31f5c2347ae2d78dc048330',
+        ]);
+
+        $job = new ChecksumWebsite($checker);
+        $job->handle();
+
+        Notification::assertNotSentTo($user, WebsiteChanged::class);
     }
 }

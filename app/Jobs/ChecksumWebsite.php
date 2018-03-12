@@ -33,7 +33,7 @@ class ChecksumWebsite implements ShouldQueue
     public function __construct(Checker $checker)
     {
         $this->checker = $checker;
-        $this->client = new Client();
+        $this->client = new Client(['verify' => false]);
     }
 
     /**
@@ -45,16 +45,17 @@ class ChecksumWebsite implements ShouldQueue
     {
         try {
             $response = $this->client->request('GET', $this->checker->url);
-        } catch (BadResponseException $e) {
+        } catch (BadResponseException $e)  {
+            // a 4xx/5xx status is fine
             $response = $e->getResponse();
         }
 
         $checksum = sha1($response->getBody());
 
-        $this->checker->user->notify(new WebsiteChanged($this->checker));
+        if ($this->checker->checksum !== $checksum) {
+            $this->checker->user->notify(new WebsiteChanged($this->checker));
+        }
 
-        $this->checker->update([
-            'checksum' => $checksum,
-        ]);
+        $this->checker->update(compact('checksum'));
     }
 }
