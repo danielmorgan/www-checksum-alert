@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Checker;
+use App\Jobs\ChecksumWebsite;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -13,17 +16,37 @@ class NotifiesWebsiteChangedTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    function a_user_can_schedule_a_checksum_to_be_run_on_a_website()
+    protected function setUp()
     {
-        $user = factory(User::class)->create();
+        parent::setUp();
 
+        Bus::fake();
+    }
+
+    /** @test */
+    function can_create_a_checker()
+    {
         $response = $this->post('/checker', [
-            'user_id' => $user->id,
+            'user_id' => factory(User::class)->create()->id,
             'url'     => route('test1'),
         ]);
 
         $response->assertRedirect('/checker');
         $this->assertDatabaseHas('checkers', ['user_id' => 1, 'url' => route('test1')]);
+    }
+
+    /** @test */
+    function a_job_is_queued()
+    {
+        $this->post('/checker', [
+            'user_id' => factory(User::class)->create()->id,
+            'url'     => route('test1'),
+        ]);
+
+        $checker = Checker::firstOrFail();
+
+        Bus::assertDispatched(ChecksumWebsite::class, function ($job) use ($checker) {
+            return $job->checker->id === $checker->id;
+        });
     }
 }

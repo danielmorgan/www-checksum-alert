@@ -15,9 +15,9 @@ Route::get('checker', 'CheckerController@index')->name('checker');
 Route::post('checker', 'CheckerController@create')->name('checker.create');
 
 Route::get('test1', function () {
-    return 'foo';
+    return response('foo');
 })->name('test1');
 
 Route::get('test2', function () {
-    return 'bar';
+    return response('bar');
 })->name('test2');
