@@ -13,16 +13,28 @@ class WebsiteChanged extends Notification
     use Queueable;
 
     /**
-     * @var \App\Checker
+     * @var string|null
      */
-    public $checker;
+    public $oldChecksum;
+
+    /**
+     * @var string
+     */
+    public $newChecksum;
+
+    /**
+     * @var string
+     */
+    public $url;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Checker $checker)
+    public function __construct(string $oldChecksum = null, string $newChecksum, string $url)
     {
-        $this->checker = $checker;
+        $this->oldChecksum = $oldChecksum;
+        $this->newChecksum = $newChecksum;
+        $this->url = $url;
     }
 
     /**
@@ -45,8 +57,10 @@ class WebsiteChanged extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->line('Website changed')
-            ->action('Check it out', $this->checker->url);
+            ->greeting('Website Changed')
+            ->line("From: {$this->oldChecksum}")
+            ->line("To: {$this->newChecksum}")
+            ->action('Check it out', $this->url);
     }
 
     /**
