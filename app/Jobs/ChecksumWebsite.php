@@ -53,7 +53,13 @@ class ChecksumWebsite implements ShouldQueue
         $checksum = sha1($response->getBody());
 
         if ($this->checker->checksum !== $checksum) {
-            $this->checker->user->notify(new WebsiteChanged($this->checker->checksum, $checksum, $this->checker->url));
+            $message = new WebsiteChanged(
+                $this->checker->checksum,
+                $checksum,
+                $this->checker->url,
+                $response->getBody()
+            );
+            $this->checker->user->notify($message);
         }
 
         $this->checker->update(compact('checksum'));

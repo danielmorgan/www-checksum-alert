@@ -28,13 +28,19 @@ class WebsiteChanged extends Notification
     public $url;
 
     /**
+     * @var string
+     */
+    public $body;
+
+    /**
      * Create a new notification instance.
      */
-    public function __construct(string $oldChecksum = null, string $newChecksum, string $url)
+    public function __construct(string $oldChecksum = null, string $newChecksum, string $url, string $body)
     {
         $this->oldChecksum = $oldChecksum;
         $this->newChecksum = $newChecksum;
         $this->url = $url;
+        $this->body = $body;
     }
 
     /**
@@ -60,6 +66,7 @@ class WebsiteChanged extends Notification
             ->greeting('Website Changed')
             ->line("From: {$this->oldChecksum}")
             ->line("To: {$this->newChecksum}")
+            ->with($this->body)
             ->action('Check it out', $this->url);
     }
 
